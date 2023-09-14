@@ -5,8 +5,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 
 class ArticleView extends StatefulWidget {
-  final String? postUrl;
-  ArticleView({super.key, this.postUrl});
+  final String postUrl;
+  ArticleView({super.key, required this.postUrl});
 
   @override
   State<ArticleView> createState() => _ArticleState();
@@ -15,10 +15,29 @@ class ArticleView extends StatefulWidget {
 
 class _ArticleState extends State<ArticleView> {
 
-  final WebViewController controller = WebViewController();
-
   @override
   Widget build(BuildContext context) {
+
+    final controller = WebViewController()
+    ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    ..setNavigationDelegate(
+      NavigationDelegate(
+        onProgress: (int progress) {
+          // print the loading progress to the console
+          // you can use this value to show a progress bar if you want
+          debugPrint("Loading: $progress%");
+        },
+        onPageStarted: (String url) {},
+        onPageFinished: (String url) {},
+        onWebResourceError: (WebResourceError error) {},
+        onNavigationRequest: (NavigationRequest request) {
+          return NavigationDecision.navigate;
+        },
+      ),
+    )
+    ..loadRequest(Uri.parse(widget.postUrl));
+    // ..loadRequest(Uri.parse("https://www.kindacode.com"));
+
     return Scaffold(
       appBar: MyAppBar(),
       body: Container(
